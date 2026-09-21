@@ -1,0 +1,5 @@
+target_density = 40
+critical_density = 10
+min_gap_area = 5
+conf_threshold = 0.5
+crs = "EPSG:25832"

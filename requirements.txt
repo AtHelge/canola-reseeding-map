@@ -1,0 +1,7 @@
+pandas
+geopandas
+shapely
+rasterio
+matplotlib
+pyproj
+pytest
