@@ -1,6 +1,10 @@
-import pandas as pd
+import logging
 
-from canola_map.join import aggregate_per_frame
+import geopandas as gpd
+import pandas as pd
+from shapely.geometry import box
+
+from canola_map.join import aggregate_per_frame, attach_footprints
 
 
 def test_aggregate_per_frame_counts_detections_above_threshold():
@@ -42,3 +46,34 @@ def test_aggregate_per_frame_includes_boundary_confidence_value():
     result = aggregate_per_frame(detections_df, conf_threshold=0.5)
 
     assert dict(zip(result["file_name"], result["detection_count"])) == {"img1": 1}
+
+
+def test_attach_footprints_logs_unmatched_file_name_and_area_share(caplog):
+    counts = pd.DataFrame(
+        {
+            "file_name": ["img1", "img2"],
+            "detection_count": [5, 3],
+        }
+    )
+
+    footprints_gdf = gpd.GeoDataFrame(
+        {"file_name": ["img1"], "geometry": [box(0, 0, 50, 100)]},
+        crs="EPSG:25832",
+    )
+
+    field_boundary_gdf = gpd.GeoDataFrame(
+        {"geometry": [box(0, 0, 100, 100)]},
+        crs="EPSG:25832",
+    )
+
+    with caplog.at_level(logging.WARNING):
+        result = attach_footprints(counts, footprints_gdf, field_boundary_gdf)
+
+    assert len(result) == 2
+    assert result.loc[result["file_name"] == "img2", "geometry"].isna().all()
+    assert result.loc[result["file_name"] == "img1", "geometry"].notna().all()
+
+    assert len(caplog.records) == 1
+    message = caplog.records[0].getMessage()
+    assert "1 file_names have no footprint match" in message
+    assert "50.0%" in message
