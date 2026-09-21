@@ -33,3 +33,7 @@ def attach_footprints(
         )
 
     return merged
+
+
+def reproject(gdf: gpd.GeoDataFrame, target_crs: str = "EPSG:25832") -> gpd.GeoDataFrame:
+    return gdf.to_crs(target_crs)

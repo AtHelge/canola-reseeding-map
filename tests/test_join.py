@@ -4,7 +4,7 @@ import geopandas as gpd
 import pandas as pd
 from shapely.geometry import box
 
-from canola_map.join import aggregate_per_frame, attach_footprints
+from canola_map.join import aggregate_per_frame, attach_footprints, reproject
 
 
 def test_aggregate_per_frame_counts_detections_above_threshold():
@@ -77,3 +77,18 @@ def test_attach_footprints_logs_unmatched_file_name_and_area_share(caplog):
     message = caplog.records[0].getMessage()
     assert "1 file_names have no footprint match" in message
     assert "50.0%" in message
+
+
+def test_reproject_converts_crs_and_yields_plausible_area_in_meters():
+    gdf = gpd.GeoDataFrame(
+        {"geometry": [box(9.0, 52.0, 9.01, 52.01)]},
+        crs="EPSG:4326",
+    )
+
+    result = reproject(gdf, target_crs="EPSG:25832")
+
+    assert result.crs.to_string() == "EPSG:25832"
+    assert result.geometry.iloc[0].geom_type == "Polygon"
+
+    area_m2 = result.geometry.area.iloc[0]
+    assert 100_000 < area_m2 < 1_000_000
