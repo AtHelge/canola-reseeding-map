@@ -43,6 +43,7 @@ def build_parser(defaults: dict) -> argparse.ArgumentParser:
     parser.add_argument("--crs", default=defaults["crs"])
     parser.add_argument("--seed", type=int, default=defaults["seed"])
     parser.add_argument("--log-level", default=defaults["log_level"])
+    parser.add_argument("--detection-subfolder", default=None)
     return parser
 
 
@@ -68,7 +69,8 @@ def _discover_detection_subfolder(data_dir: Path) -> str:
 
     if len(subfolders) != 1:
         raise RuntimeError(
-            f"Expected exactly one subfolder in {detections_dir}, found {len(subfolders)}"
+            f"Expected exactly one subfolder in {detections_dir}, found {len(subfolders)}: "
+            f"{subfolders}. Pass --detection-subfolder to pick one."
         )
 
     return subfolders[0]
@@ -79,7 +81,7 @@ def run_pipeline(args: argparse.Namespace) -> None:
     out_path = Path(args.out)
     png_path = out_path.with_suffix(".png")
 
-    subfolder = _discover_detection_subfolder(data_dir)
+    subfolder = args.detection_subfolder or _discover_detection_subfolder(data_dir)
     detections_df = _run_step("load_detections", data_io.load_detections, data_dir, subfolder)
 
     footprints_gdf = _run_step("load_footprints", data_io.load_footprints, data_dir)

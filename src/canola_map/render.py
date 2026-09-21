@@ -31,8 +31,10 @@ def make_png(
             ax=ax,
             column="density_per_m2",
             cmap="RdYlGn",
+            vmin=0,
+            vmax=target_density * 2,
             legend=True,
-            legend_kwds={"label": "Density (detections / m2)"},
+            legend_kwds={"label": "Density (detections / m2, capped at 2x target)"},
             edgecolor="none",
         )
 

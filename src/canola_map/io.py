@@ -16,7 +16,12 @@ def load_detections(data_dir: Path, subfolder: str) -> pd.DataFrame:
         return pd.DataFrame()
 
     logger.info("Loading %d detection CSVs from %s", len(csv_paths), subfolder_dir)
-    frames = [pd.read_csv(csv_path).assign(file_name=csv_path.stem) for csv_path in csv_paths]
+    frames = [
+        pd.read_csv(csv_path, usecols=["conf"])
+        .rename(columns={"conf": "confidence"})
+        .assign(file_name=csv_path.stem)
+        for csv_path in csv_paths
+    ]
     return pd.concat(frames, ignore_index=True)
 
 
@@ -29,12 +34,17 @@ def load_footprints(data_dir: Path) -> gpd.GeoDataFrame:
         return gpd.GeoDataFrame()
 
     logger.info("Loading %d footprint shapefiles from %s", len(shp_paths), footprints_dir)
-    frames = [gpd.read_file(shp_path).assign(file_name=shp_path.stem) for shp_path in shp_paths]
+    frames = []
+    for shp_path in shp_paths:
+        shp_gdf = gpd.read_file(shp_path)
+        if "file_name" not in shp_gdf.columns:
+            shp_gdf = shp_gdf.assign(file_name=shp_path.stem)
+        frames.append(shp_gdf)
     return pd.concat(frames, ignore_index=True)
 
 
 def load_field_boundary(data_dir: Path) -> gpd.GeoDataFrame:
-    boundary_path = data_dir / "field_boundary.shp"
+    boundary_path = data_dir / "field_boundary" / "field_boundary.shp"
 
     if not boundary_path.exists():
         logger.warning("No field boundary shapefile found at %s", boundary_path)

@@ -15,7 +15,7 @@ def detections_data_dir(tmp_path: Path) -> Path:
         {
             "x": [10.0, 20.0],
             "y": [50.0, 60.0],
-            "confidence": [0.8, 0.9],
+            "conf": [0.8, 0.9],
         }
     ).to_csv(subfolder_dir / "plot1.csv", index=False)
 
@@ -23,7 +23,7 @@ def detections_data_dir(tmp_path: Path) -> Path:
         {
             "x": [30.0],
             "y": [70.0],
-            "confidence": [0.6],
+            "conf": [0.6],
         }
     ).to_csv(subfolder_dir / "plot2.csv", index=False)
 
@@ -50,9 +50,28 @@ def footprints_data_dir(tmp_path: Path) -> Path:
 
 @pytest.fixture
 def field_boundary_data_dir(tmp_path: Path) -> Path:
+    boundary_dir = tmp_path / "field_boundary"
+    boundary_dir.mkdir(parents=True)
+
     gpd.GeoDataFrame(
         {"geometry": [box(0, 0, 100, 100)]},
         crs="EPSG:25832",
-    ).to_file(tmp_path / "field_boundary.shp")
+    ).to_file(boundary_dir / "field_boundary.shp")
+
+    return tmp_path
+
+
+@pytest.fixture
+def single_shapefile_footprints_data_dir(tmp_path: Path) -> Path:
+    footprints_dir = tmp_path / "image_footprints"
+    footprints_dir.mkdir(parents=True)
+
+    gpd.GeoDataFrame(
+        {
+            "file_name": ["img001", "img002"],
+            "geometry": [box(0, 0, 10, 10), box(10, 0, 20, 10)],
+        },
+        crs="EPSG:25832",
+    ).to_file(footprints_dir / "image_footprints.shp")
 
     return tmp_path

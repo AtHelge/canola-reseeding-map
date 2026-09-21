@@ -23,9 +23,11 @@ def attach_footprints(
     unmatched_count = int(unmatched_mask.sum())
 
     if unmatched_count > 0:
-        matched_area = merged.loc[~unmatched_mask, "geometry"].area.sum()
-        field_area = field_boundary_gdf.geometry.area.sum()
-        area_share = matched_area / field_area if field_area else 0.0
+        matched_union = merged.loc[~unmatched_mask, "geometry"].union_all()
+        field_union = field_boundary_gdf.geometry.union_all()
+        field_area = field_union.area
+        covered_area = matched_union.intersection(field_union).area
+        area_share = covered_area / field_area if field_area else 0.0
         logger.warning(
             "%d file_names have no footprint match; matched footprints cover %.1f%% of the field area",
             unmatched_count,
