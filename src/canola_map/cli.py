@@ -21,6 +21,7 @@ HARDCODED_DEFAULTS = {
     "crs": "EPSG:25832",
     "seed": 42,
     "log_level": "INFO",
+    "detection_subfolder": "crop_canola",
 }
 
 
@@ -43,7 +44,7 @@ def build_parser(defaults: dict) -> argparse.ArgumentParser:
     parser.add_argument("--crs", default=defaults["crs"])
     parser.add_argument("--seed", type=int, default=defaults["seed"])
     parser.add_argument("--log-level", default=defaults["log_level"])
-    parser.add_argument("--detection-subfolder", default="crop_canola")
+    parser.add_argument("--detection-subfolder", default=defaults["detection_subfolder"])
     return parser
 
 
