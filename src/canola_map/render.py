@@ -14,7 +14,6 @@ logger = logging.getLogger(__name__)
 
 def make_png(
     tiles_gdf: gpd.GeoDataFrame,
-    zones_gdf: gpd.GeoDataFrame,
     field_boundary_gdf: gpd.GeoDataFrame,
     out_path: Path,
     target_density: float,
@@ -26,23 +25,21 @@ def make_png(
     data_tiles = tiles_gdf[has_density]
     no_data_tiles = tiles_gdf[~has_density]
 
-    if not data_tiles.empty:
-        data_tiles.plot(
-            ax=ax,
-            column="density_per_m2",
-            cmap="RdYlGn",
-            vmin=0,
-            vmax=target_density * 2,
-            legend=True,
-            legend_kwds={"label": "Density (detections / m2, capped at 2x target)"},
-            edgecolor="none",
-        )
+    reseed_tiles = data_tiles[data_tiles["gap_status"] == "reseed"]
+    too_small_tiles = data_tiles[data_tiles["gap_status"] == "too_small"]
+    ok_tiles = data_tiles[data_tiles["gap_status"] == "ok"]
+
+    if not ok_tiles.empty:
+        ok_tiles.plot(ax=ax, color="green")
+
+    if not too_small_tiles.empty:
+        too_small_tiles.plot(ax=ax, color="orange")
+
+    if not reseed_tiles.empty:
+        reseed_tiles.plot(ax=ax, color="red")
 
     if not no_data_tiles.empty:
-        no_data_tiles.plot(ax=ax, color="grey", edgecolor="none")
-
-    if not zones_gdf.empty:
-        zones_gdf.boundary.plot(ax=ax, color="red", linewidth=1.5)
+        no_data_tiles.plot(ax=ax, color="grey")
 
     field_boundary_gdf.boundary.plot(ax=ax, color="black", linewidth=1.0)
 
@@ -52,9 +49,9 @@ def make_png(
     ax.set_axis_off()
 
     legend_handles = [
-        Line2D([0], [0], color="red", lw=1.5, label="Gap zone"),
-        Line2D([0], [0], color="black", lw=1.0, label="Field boundary"),
-        Line2D([0], [0], marker="s", color="w", markerfacecolor="grey", markersize=10, label="No data"),
+        Line2D([0], [0], marker="s", color="w", markerfacecolor="red", markersize=10, label="Below critical, reseed-worthy (cluster >= 5 m2)"),
+        Line2D([0], [0], marker="s", color="w", markerfacecolor="orange", markersize=10, label="Below critical, area too small (cluster < 5 m2)"),
+        Line2D([0], [0], marker="s", color="w", markerfacecolor="green", markersize=10, label="OK"),
     ]
     ax.legend(handles=legend_handles, loc="lower left")
 

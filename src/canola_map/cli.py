@@ -43,7 +43,7 @@ def build_parser(defaults: dict) -> argparse.ArgumentParser:
     parser.add_argument("--crs", default=defaults["crs"])
     parser.add_argument("--seed", type=int, default=defaults["seed"])
     parser.add_argument("--log-level", default=defaults["log_level"])
-    parser.add_argument("--detection-subfolder", default=None)
+    parser.add_argument("--detection-subfolder", default="crop_canola")
     return parser
 
 
@@ -78,8 +78,10 @@ def _discover_detection_subfolder(data_dir: Path) -> str:
 
 def run_pipeline(args: argparse.Namespace) -> None:
     data_dir = Path(args.data)
-    out_path = Path(args.out)
-    png_path = out_path.with_suffix(".png")
+    out_dir = Path(args.out)
+    out_dir.mkdir(parents=True, exist_ok=True)
+    gpkg_path = out_dir / "reseeding_map.gpkg"
+    png_path = out_dir / "reseeding_map.png"
 
     subfolder = args.detection_subfolder or _discover_detection_subfolder(data_dir)
     detections_df = _run_step("load_detections", data_io.load_detections, data_dir, subfolder)
@@ -107,14 +109,15 @@ def run_pipeline(args: argparse.Namespace) -> None:
     tiles_gdf = _run_step(
         "flag_critical", classify.flag_critical, tiles_gdf, args.critical_density
     )
-    zones_gdf = _run_step("dissolve_gaps", classify.dissolve_gaps, tiles_gdf, args.min_gap_area)
+    tiles_gdf, zones_gdf = _run_step(
+        "dissolve_gaps", classify.dissolve_gaps, tiles_gdf, args.min_gap_area
+    )
 
-    _run_step("export_geopackage", write.export_geopackage, tiles_gdf, zones_gdf, out_path)
+    _run_step("export_geopackage", write.export_geopackage, tiles_gdf, zones_gdf, gpkg_path)
     _run_step(
         "make_png",
         render.make_png,
         tiles_gdf,
-        zones_gdf,
         field_boundary_gdf,
         png_path,
         args.target_density,

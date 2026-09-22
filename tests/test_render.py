@@ -7,22 +7,24 @@ from shapely.geometry import box
 from canola_map.render import make_png
 
 
-def test_make_png_creates_file_with_mixed_data_and_gap_zone(tmp_path: Path):
+def test_make_png_creates_file_with_all_gap_statuses_and_no_data(tmp_path: Path):
     tiles_gdf = gpd.GeoDataFrame(
         {
-            "density_per_m2": [0.25, np.nan, 0.05],
-            "geometry": [box(0, 0, 10, 10), box(10, 0, 20, 10), box(20, 0, 30, 10)],
+            "density_per_m2": [15.0, np.nan, 5.0, 3.0],
+            "is_critical": [False, False, True, True],
+            "gap_status": ["ok", "ok", "too_small", "reseed"],
+            "geometry": [
+                box(0, 0, 10, 10),
+                box(10, 0, 20, 10),
+                box(20, 0, 30, 10),
+                box(30, 0, 40, 10),
+            ],
         },
         crs="EPSG:25832",
     )
 
-    zones_gdf = gpd.GeoDataFrame(
-        {"geometry": [box(20, 0, 30, 10)]},
-        crs="EPSG:25832",
-    )
-
     field_boundary_gdf = gpd.GeoDataFrame(
-        {"geometry": [box(0, 0, 30, 10)]},
+        {"geometry": [box(0, 0, 40, 10)]},
         crs="EPSG:25832",
     )
 
@@ -30,7 +32,6 @@ def test_make_png_creates_file_with_mixed_data_and_gap_zone(tmp_path: Path):
 
     make_png(
         tiles_gdf,
-        zones_gdf,
         field_boundary_gdf,
         out_path,
         target_density=40,
@@ -41,27 +42,26 @@ def test_make_png_creates_file_with_mixed_data_and_gap_zone(tmp_path: Path):
     assert out_path.stat().st_size > 0
 
 
-def test_make_png_handles_no_gap_zones(tmp_path: Path):
+def test_make_png_handles_only_ok_tiles(tmp_path: Path):
     tiles_gdf = gpd.GeoDataFrame(
         {
-            "density_per_m2": [0.25, 0.3],
+            "density_per_m2": [15.0, 20.0],
+            "is_critical": [False, False],
+            "gap_status": ["ok", "ok"],
             "geometry": [box(0, 0, 10, 10), box(10, 0, 20, 10)],
         },
         crs="EPSG:25832",
     )
-
-    zones_gdf = gpd.GeoDataFrame({"geometry": []}, crs="EPSG:25832")
 
     field_boundary_gdf = gpd.GeoDataFrame(
         {"geometry": [box(0, 0, 20, 10)]},
         crs="EPSG:25832",
     )
 
-    out_path = tmp_path / "map_no_zones.png"
+    out_path = tmp_path / "map_only_ok.png"
 
     make_png(
         tiles_gdf,
-        zones_gdf,
         field_boundary_gdf,
         out_path,
         target_density=40,
