@@ -5,3 +5,4 @@ outputs/
 check_camera.py
 .pytest_cache/
 *.egg-info/
+zips/
