@@ -32,11 +32,11 @@ def test_export_geopackage_writes_both_layers_with_expected_columns(tmp_path: Pa
 
     assert out_path.exists()
 
-    density_layer = gpd.read_file(out_path, layer="density")
-    gaps_layer = gpd.read_file(out_path, layer="gaps")
+    whole_field_layer = gpd.read_file(out_path, layer="whole_field")
+    reseeding_zones_layer = gpd.read_file(out_path, layer="reseeding_zones")
 
-    assert list(density_layer.columns) == ["density_per_m2", "area_m2", "geometry"]
-    assert list(gaps_layer.columns) == ["area_m2", "mean_density", "n_tiles", "geometry"]
+    assert list(whole_field_layer.columns) == ["density_per_m2", "area_m2", "geometry"]
+    assert list(reseeding_zones_layer.columns) == ["area_m2", "mean_density", "n_tiles", "geometry"]
 
-    assert len(density_layer) == 2
-    assert len(gaps_layer) == 1
+    assert len(whole_field_layer) == 2
+    assert len(reseeding_zones_layer) == 1

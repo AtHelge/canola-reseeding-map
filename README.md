@@ -20,7 +20,7 @@ pip install -r requirements.txt
 python -m canola_map.cli --data <path to field data folder> --out <output folder>
 ```
 
-`--data` must point at a folder containing a `detections/<subfolder>/*.csv` tree, an `image_footprints/*.shp` shapefile, and a `field_boundary/field_boundary.shp` shapefile. The pipeline writes `reseeding_map.gpkg` (with `density` and `gaps` layers) and `reseeding_map.png` into `--out`, creating that folder if needed.
+`--data` must point at a folder containing a `detections/<subfolder>/*.csv` tree, an `image_footprints/*.shp` shapefile, and a `field_boundary/field_boundary.shp` shapefile. The pipeline writes `reseeding_map.gpkg` (with `whole_field` and `reseeding_zones` layers) and `reseeding_map.png` into `--out`, creating that folder if needed.
 
 ## CLI parameters
 

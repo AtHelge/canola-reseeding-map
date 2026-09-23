@@ -49,11 +49,11 @@ def make_png(
     ax.set_axis_off()
 
     legend_handles = [
-        Line2D([0], [0], marker="s", color="w", markerfacecolor="red", markersize=10, label="Below critical, reseed-worthy (cluster >= 5 m2)"),
-        Line2D([0], [0], marker="s", color="w", markerfacecolor="orange", markersize=10, label="Below critical, area too small (cluster < 5 m2)"),
-        Line2D([0], [0], marker="s", color="w", markerfacecolor="green", markersize=10, label="OK"),
+        Line2D([0], [0], marker="s", color="w", markerfacecolor="green", markersize=10, label=f"Above {critical_density} plants/m2"),
+        Line2D([0], [0], marker="s", color="w", markerfacecolor="red", markersize=10, label=f"Below {critical_density} plants/m2, reseed-worthy (cluster >= 5 m2)"),
+        Line2D([0], [0], marker="s", color="w", markerfacecolor="orange", markersize=10, label=f"Below {critical_density} plants/m2, area too small (cluster < 5 m2)"),
     ]
-    ax.legend(handles=legend_handles, loc="lower left")
+    ax.legend(handles=legend_handles, loc="center left", bbox_to_anchor=(1.02, 0.5))
 
     _add_north_arrow(ax)
     _add_scale_bar(ax)
