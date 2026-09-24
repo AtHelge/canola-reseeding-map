@@ -5,21 +5,26 @@ Turns per-image canola-plant detections and their camera footprints into a resee
 ## Setup
 
 ```
+git clone <repo-url>
+cd canola-reseeding-map
+```
+
+```
+parent-folder/
+├── canola-reseeding-map/
+└── data/field01/
+```
+
+```
 python -m venv venv
 venv\Scripts\activate
 pip install -r requirements.txt
 pip install -e .
 ```
 
-`config/default.toml` ships with the repo and is required — the pipeline reads its values as CLI defaults and will fail with a `FileNotFoundError` if it's missing.
-
-## Usage
-
 ```
-python -m canola_map.cli --data data/field01 --out outputs/field01
+python -m canola_map.cli --data ../data/field01 --out outputs/field01
 ```
-
-`--data` must contain `detections/<subfolder>/*.csv`, `image_footprints/*.shp`, and `field_boundary/field_boundary.shp`.
 
 ## Parameters
 
@@ -59,7 +64,3 @@ The pipeline is fully deterministic — no randomness is used anywhere, so no ra
 1. Layer > Add Layer > Add Vector Layer, select `reseeding_map.gpkg`.
 2. Choose both the `whole_field` and `reseeding_zones` layers.
 3. To match the PNG's coloring: right-click `whole_field` > Properties > Symbology > switch to "Categorized" > Value: `gap_status` > Classify.
-
-## Limitations
-
-See the full write-up for details. In short: tile-resolution (not per-plant), confidence-threshold sensitivity, no ground truth available.
