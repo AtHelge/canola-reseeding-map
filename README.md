@@ -1,6 +1,6 @@
 # canola-reseeding
 
-Turns per-image canola-plant detections and their camera footprints into a reseeding map: it estimates plant density per image tile, flags tiles below a critical density, groups adjacent critical tiles into gap zones, and exports a GeoPackage plus a PNG overview for planning targeted reseeding passes.
+Drone-based reseeding map generator for winter oilseed rape fields — uses plant-level detections per drone frame and their footprints to generate a map of low-density gaps, filtering out noise via confidence, geometry, and minimum-area checks. Outputs a georeferenced GeoPackage + PNG.
 
 ## Setup
 
