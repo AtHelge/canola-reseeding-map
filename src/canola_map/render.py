@@ -1,4 +1,3 @@
-import logging
 from pathlib import Path
 
 import geopandas as gpd
@@ -8,8 +7,6 @@ matplotlib.use("Agg")
 
 import matplotlib.pyplot as plt
 from matplotlib.lines import Line2D
-
-logger = logging.getLogger(__name__)
 
 
 def make_png(
@@ -61,7 +58,6 @@ def make_png(
     out_path.parent.mkdir(parents=True, exist_ok=True)
     fig.savefig(out_path, dpi=200, bbox_inches="tight")
     plt.close(fig)
-    logger.info("Saved map to %s", out_path)
 
 
 def _add_north_arrow(ax) -> None:

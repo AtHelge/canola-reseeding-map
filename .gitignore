@@ -1,8 +1,9 @@
 venv/
 __pycache__/
-outputs/
 *.pyc
-check_camera.py
 .pytest_cache/
 *.egg-info/
+*.zip
 zips/
+check_*.py
+quick_*.png

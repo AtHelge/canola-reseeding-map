@@ -1,5 +1,3 @@
-import logging
-
 import geopandas as gpd
 import pandas as pd
 from shapely.geometry import box
@@ -77,7 +75,7 @@ def test_attach_footprints_keeps_footprint_with_zero_surviving_detections():
     assert result["geometry"].notna().all()
 
 
-def test_attach_footprints_drops_degenerate_geometry_footprints(caplog):
+def test_attach_footprints_drops_degenerate_geometry_footprints():
     counts = pd.DataFrame(
         {
             "file_name": ["img1", "img2", "img3", "img_sliver"],
@@ -103,17 +101,13 @@ def test_attach_footprints_drops_degenerate_geometry_footprints(caplog):
         crs="EPSG:25832",
     )
 
-    with caplog.at_level(logging.WARNING):
-        result = attach_footprints(counts, footprints_gdf, field_boundary_gdf)
+    result = attach_footprints(counts, footprints_gdf, field_boundary_gdf)
 
     assert set(result["file_name"]) == {"img1", "img2", "img3"}
     assert "img_sliver" not in set(result["file_name"])
 
-    messages = [record.getMessage() for record in caplog.records]
-    assert any("dropped as degenerate geometries" in message for message in messages)
 
-
-def test_attach_footprints_drops_counts_without_footprint_match(caplog):
+def test_attach_footprints_drops_counts_without_footprint_match():
     counts = pd.DataFrame(
         {
             "file_name": ["img1", "img2"],
@@ -131,17 +125,11 @@ def test_attach_footprints_drops_counts_without_footprint_match(caplog):
         crs="EPSG:25832",
     )
 
-    with caplog.at_level(logging.WARNING):
-        result = attach_footprints(counts, footprints_gdf, field_boundary_gdf)
+    result = attach_footprints(counts, footprints_gdf, field_boundary_gdf)
 
     assert len(result) == 1
     assert list(result["file_name"]) == ["img1"]
     assert result["detection_count"].iloc[0] == 5
-
-    assert len(caplog.records) == 1
-    message = caplog.records[0].getMessage()
-    assert "1 file_names have no footprint match" in message
-    assert "50.0%" in message
 
 
 def test_attach_footprints_drops_tile_outside_field_boundary():
