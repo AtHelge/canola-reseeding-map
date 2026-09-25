@@ -32,10 +32,10 @@ python -m canola_map.cli --data ../data/field01 --out outputs/field01
 |---|---|---|
 | `--data` | required | Path to the field data folder. |
 | `--out` | required | Output folder for the GeoPackage and PNG. |
-| `--target-density` | 40 | Established autumn establishment target for winter oilseed rape (DLR Rheinhessen-Nahe-Hunsrück). |
-| `--critical-density` | 10 | Lower bound of economically viable stand density from UK field-trial literature (Teagasc / Roques & Berry 2015). |
-| `--min-gap-area` | 5 | Minimum contiguous area for a gap to count as a real decision rather than noise (task specification). |
-| `--conf-threshold` | 0.2 | Empirically chosen: higher values discarded too many valid low-confidence detections and produced implausibly high critical rates; sensitivity flattens out below ~0.2; no ground truth exists to validate further. |
+| `--target-density` | 40 | Average target for winter oilseed rape |
+| `--critical-density` | 10 | Lower bound of stand density |
+| `--min-gap-area` | 5 | Minimum contiguous area for a gap to count as a real reseeding decision |
+| `--conf-threshold` | 0.2 | higher values discarded too many valid low-confidence detections and produced implausibly high critical rates; sensitivity flattens out below ~0.2; no ground truth exists to validate further. |
 | `--crs` | EPSG:25832 | Metric CRS (UTM 32N) all geometry is reprojected into before any area calculation. |
 | `--detection-subfolder` | crop_canola | Selects the detection class subfolder; the data also ships a `grass_weeds` class. |
 
